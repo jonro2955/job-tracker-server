@@ -1,22 +1,35 @@
 var express = require("express");
 var router = express.Router();
+var pool = require("./db");
 
 router.get("/api/connect", (req, res) => {
   res.json("connected to server");
 });
 
 /* https://www.freecodecamp.org/news/fullstack-react-blog-app-with-express-and-psql/#setting-up-express-routes-and-psql-queries */
-router.post("/api/post/posttodb", (req, res, next) => {
-  const values = [req.body.title, req.body.body, req.body.uid, req.body.username];
-  pool.query(
-    `INSERT INTO posts(title, body, user_id, author, date_created)
-              VALUES($1, $2, $3, $4, NOW() )`,
-    values,
-    (q_err, q_res) => {
-      if (q_err) return next(q_err);
-      res.json(q_res.rows);
-    }
-  );
+router.post("/api/post/postapp", (req, res, next) => {
+  const values = [
+    req.body.userName,
+    req.body.postingURL,
+    req.body.jobDescription,
+    req.body.companyName,
+    req.body.jobTitle,
+    req.body.jobNotes,
+    req.body.files,
+    req.body.tags,
+    req.body.careerName,
+    req.body.applicationDate,
+  ];
+  console.log("backend", values);
+  // pool.query(
+  //   `INSERT INTO applications(username, posting_url, job_description, company_name, job_title, job_notes, files, tags, career_name, application_date )
+  //             VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+  //   values,
+  //   (q_err, q_res) => {
+  //     if (q_err) return next(q_err);
+  //     res.json(q_res.rows);
+  //   }
+  // );
 });
 
 router.put("/api/put/post", (req, res, next) => {

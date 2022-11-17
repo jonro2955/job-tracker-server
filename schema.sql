@@ -1,23 +1,40 @@
--- This file provides a reference for the database structure. It does not create a database. These commands need to be enetered into the PSQL terminal either manually or as a batch in order to create the database.
--- In keeping with SQL convention, all lowercase text is user defined column or table names, and all uppercase text is SQL commands.
+/* 
+This file does not create the database. These commands must be entered into PSQL terminal  manually or in a batch in order to initially set up the database.
+  
+Job application data storage format: 
 
-/*     
 const data = {
   jobPostingURL: jobPostingURL,
   jobDescription: jobDescription.toString("html"),
   companyName: companyName,
   jobTitle: jobTitle,
   jobNotes: jobNotes.toString("html"),
-  files: files,
-  currentCareerNum: currentCareerNum,
+  droppedFiles: droppedFiles,
+  tags: tags.split(","),
+  // careersList: careersList, //not needed for saving job app
+  // currentCareerNum: currentCareerNum, //not needed for saving job app
   careerName: careersList[currentCareerNum],
   username: context.isAuthenticated ? context.user.email : "demo",
-  applicationDate: getDate(),
-};
+  applicationDate: getDateNumber(),
+}
 */
+CREATE TABLE applications (
+  app_id SERIAL,
+  username TEXT REFERENCES users(username),
+  posting_url TEXT,
+  job_description TEXT,
+  company_name TEXT NOT NULL REFERENCES companies(company_name),
+  job_title TEXT NOT NULL,
+  job_notes TEXT,
+  files BYTEA, --https://www.postgresql.org/docs/7.4/jdbc-binary-data.html
+  tags TEXT [],
+  career_name TEXT,
+  application_date INT NOT NULL,
+  PRIMARY KEY(app_id)
+);
 
-CREATE TABLE user (
-  username TEXT UNIQUE NOT NULL, --this is the user's email (or "demo")
+CREATE TABLE users (
+  username TEXT UNIQUE NOT NULL, --user's email string or "demo" if logged out
   careers_list TEXT [], 
   current_career_num INT,
   date_created DATE,
@@ -25,22 +42,10 @@ CREATE TABLE user (
   PRIMARY KEY(username)
 );
 
-CREATE TABLE company (
-  company_name TEXT NOT NULL,
+CREATE TABLE companies (
+  company_id SERIAL,
+  company_name TEXT UNIQUE NOT NULL,
   jobs TEXT [],
-  PRIMARY KEY(company_name)
+  PRIMARY KEY(company_id)
 );
 
-CREATE TABLE app (
-  app_id SERIAL,
-  company_name TEXT NOT NULL,
-  job_title TEXT NOT NULL,
-  applicant_name TEXT REFERENCES users(username),
-  application_date INT NOT NULL,
-  posting_url TEXT,
-  career_name TEXT,
-  job_description TEXT,
-  job_notes TEXT,
-  files TEXT, --Should not be TEXT. TBD
-  PRIMARY KEY(app_id, company_name, job_title)
-);
