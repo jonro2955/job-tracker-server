@@ -9,11 +9,11 @@ router.get("/api/connect", (req, res) => {
 /* https://www.freecodecamp.org/news/fullstack-react-blog-app-with-express-and-psql/#setting-up-express-routes-and-psql-queries */
 router.post("/api/post/postapp", (req, res, next) => {
   const values = [
-    req.body.userName,
+    req.body.username,
     req.body.postingURL,
-    req.body.jobDescription,
     req.body.companyName,
     req.body.jobTitle,
+    req.body.jobDescription,
     req.body.jobNotes,
     req.body.files,
     req.body.tags,
@@ -21,15 +21,15 @@ router.post("/api/post/postapp", (req, res, next) => {
     req.body.applicationDate,
   ];
   console.log("backend", values);
-  // pool.query(
-  //   `INSERT INTO applications(username, posting_url, job_description, company_name, job_title, job_notes, files, tags, career_name, application_date )
-  //             VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-  //   values,
-  //   (q_err, q_res) => {
-  //     if (q_err) return next(q_err);
-  //     res.json(q_res.rows);
-  //   }
-  // );
+  pool.query(
+    `INSERT INTO apps(username, posting_url, company_name, job_title, job_description, job_notes, files, tags, career_name, application_date )
+              VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+    values,
+    (q_err, q_res) => {
+      if (q_err) return next(q_err);
+      res.json(q_res.rows);
+    }
+  );
 });
 
 router.put("/api/put/post", (req, res, next) => {

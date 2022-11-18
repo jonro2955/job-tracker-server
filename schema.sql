@@ -18,28 +18,31 @@ const data = {
   applicationDate: getDateNumber(),
 }
 */
-CREATE TABLE applications (
-  app_id SERIAL,
-  username TEXT REFERENCES users(username),
-  posting_url TEXT,
-  job_description TEXT,
-  company_name TEXT NOT NULL REFERENCES companies(company_name),
-  job_title TEXT NOT NULL,
-  job_notes TEXT,
-  files BYTEA, --https://www.postgresql.org/docs/7.4/jdbc-binary-data.html
-  tags TEXT [],
-  career_name TEXT,
-  application_date INT NOT NULL,
-  PRIMARY KEY(app_id)
-);
 
 CREATE TABLE users (
   username TEXT UNIQUE NOT NULL, --user's email string or "demo" if logged out
   careers_list TEXT [], 
   current_career_num INT,
-  date_created DATE,
-  last_login DATE,
+  date_created BIGINT,
+  last_login BIGINT,
   PRIMARY KEY(username)
+);
+
+INSERT INTO users(username, careers_list, current_career_num, date_created, last_login) VALUES('demoUser', array['demo career 1', 'demo career 2', 'demo career 3'], 0, 202211152250, 202211152250);
+
+CREATE TABLE apps (
+  app_id SERIAL,
+  username TEXT REFERENCES users(username),
+  posting_url TEXT,
+  job_description TEXT,
+  company_name TEXT NOT NULL,
+  job_title TEXT NOT NULL,
+  job_notes TEXT,
+  files BYTEA, --https://www.postgresql.org/docs/7.4/jdbc-binary-data.html
+  tags TEXT [],
+  career_name TEXT,
+  application_date BIGINT NOT NULL,
+  PRIMARY KEY(app_id)
 );
 
 CREATE TABLE companies (
@@ -48,4 +51,3 @@ CREATE TABLE companies (
   jobs TEXT [],
   PRIMARY KEY(company_id)
 );
-
