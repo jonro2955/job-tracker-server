@@ -21,14 +21,12 @@ const data = {
 
 CREATE TABLE users (
   username TEXT UNIQUE NOT NULL, --user's email string or "demo" if logged out
-  careers_list TEXT [], 
-  current_career_num INT,
-  date_created BIGINT,
-  last_login BIGINT,
+  careers_list TEXT [] DEFAULT array['Career 1'], 
+  current_career_num INT DEFAULT 0,
   PRIMARY KEY(username)
 );
 
-INSERT INTO users(username, careers_list, current_career_num, date_created, last_login) VALUES('demoUser', array['demo career 1', 'demo career 2', 'demo career 3'], 0, 202211152250, 202211152250);
+INSERT INTO users(username, careers_list, current_career_num) VALUES('demoUser', array['demo career 1', 'demo career 2', 'demo career 3'], 0);
 
 CREATE TABLE apps (
   app_id SERIAL,
