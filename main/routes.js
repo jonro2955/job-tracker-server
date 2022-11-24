@@ -72,4 +72,28 @@ router.put("/api/put/careerslist", (req, res, next) => {
   });
 });
 
+router.put("/api/put/renamecareer", (req, res, next) => {
+  const values = [
+    req.body.newCareerName,
+    req.body.oldCareerName,
+    req.body.careersList,
+    req.body.username,
+  ];
+  /* 
+  const data = {
+    newCareerName: newName,
+    oldCareerName: oldName,
+    careersList: newList,
+    username: currentUser,   
+  };
+  */
+  pool.query(
+    `UPDATE users SET careers_list = $3 WHERE username = $4; UPDATE apps SET career_name = $1 WHERE career_name = $2 AND username = $4;`,
+    values,
+    (q_err, q_res) => {
+      res.json(q_res.rows);
+    }
+  );
+});
+
 module.exports = router;
