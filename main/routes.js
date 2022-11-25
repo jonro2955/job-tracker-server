@@ -60,6 +60,7 @@ router.put("/api/put/careernum", (req, res, next) => {
     `UPDATE users SET current_career_num = $1 WHERE username = $2`,
     values,
     (q_err, q_res) => {
+      if (q_err) return next(q_err);
       res.json(q_res.rows);
     }
   );
@@ -68,30 +69,48 @@ router.put("/api/put/careernum", (req, res, next) => {
 router.put("/api/put/careerslist", (req, res, next) => {
   const values = [req.body.careersList, req.body.username];
   pool.query(`UPDATE users SET careers_list = $1 WHERE username = $2`, values, (q_err, q_res) => {
-    res.json(q_res.rows);
+    if (q_err) return next(q_err);
+    res.json(q_res);
   });
 });
 
+/* 
+req.body = {
+  username: 'freemovement@live.ca',
+  careersList: [
+    '111', '22', '3',
+    '4',   '5',  '6',
+    '7',   '8',  '9',
+    '10',  '11', '12'
+  ],
+  oldCareerName: 'o',
+  newCareerName: 'n'
+}
+*/
 router.put("/api/put/renamecareer", (req, res, next) => {
-  const values = [
-    req.body.newCareerName,
-    req.body.oldCareerName,
-    req.body.careersList,
-    req.body.username,
-  ];
-  /* 
-  const data = {
-    newCareerName: newName,
-    oldCareerName: oldName,
-    careersList: newList,
-    username: currentUser,   
-  };
-  */
+  let err_combined = { err1: {}, err2: {} };
+  let res_combined = { update_result_1: {}, update_result_2: {} };
   pool.query(
-    `UPDATE users SET careers_list = $3 WHERE username = $4; UPDATE apps SET career_name = $1 WHERE career_name = $2 AND username = $4;`,
-    values,
+    `UPDATE apps SET career_name = $1 WHERE career_name = $2 AND username = $3`,
+    [req.body.newCareerName, req.body.oldCareerName, req.body.username],
     (q_err, q_res) => {
-      res.json(q_res.rows);
+      if (q_err) {
+        err_combined.err1 = q_err;
+      } else {
+        res_combined.update_result_1 = q_res;
+      }
+    }
+  );
+  pool.query(
+    `UPDATE users SET careers_list = $1 WHERE username = $2`,
+    [req.body.careersList, req.body.username],
+    (q_err, q_res) => {
+      if (q_err) {
+        err_combined.err2 = q_err;
+        return next(err_combined);
+      }
+      res_combined.update_result_2 = q_res;
+      res.json(res_combined);
     }
   );
 });
