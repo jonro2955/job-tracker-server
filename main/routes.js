@@ -87,15 +87,16 @@ req.body = {
   newCareerName: 'n'
 }
 */
+// look into "patch" instead of "put" to update only a few attributes
 router.put("/api/put/renamecareer", (req, res, next) => {
-  let err_combined = { err1: {}, err2: {} };
+  let err_combined = { update_err1: {}, update_err2: {} };
   let res_combined = { update_result_1: {}, update_result_2: {} };
   pool.query(
     `UPDATE apps SET career_name = $1 WHERE career_name = $2 AND username = $3`,
     [req.body.newCareerName, req.body.oldCareerName, req.body.username],
     (q_err, q_res) => {
       if (q_err) {
-        err_combined.err1 = q_err;
+        err_combined.update_err1 = q_err;
       } else {
         res_combined.update_result_1 = q_res;
       }
@@ -106,7 +107,7 @@ router.put("/api/put/renamecareer", (req, res, next) => {
     [req.body.careersList, req.body.username],
     (q_err, q_res) => {
       if (q_err) {
-        err_combined.err2 = q_err;
+        err_combined.update_err2 = q_err;
         return next(err_combined);
       }
       res_combined.update_result_2 = q_res;
