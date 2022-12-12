@@ -31,17 +31,24 @@ INSERT INTO users(username, careers_list, current_career_num) VALUES('demoUser',
 CREATE TABLE apps (
   app_id SERIAL,
   username TEXT REFERENCES users(username),
+  career_name TEXT,
   posting_url TEXT,
-  job_description TEXT,
   company_name TEXT NOT NULL,
   job_title TEXT NOT NULL,
+  job_description TEXT,
   job_notes TEXT,
-  files BYTEA, --https://www.postgresql.org/docs/7.4/jdbc-binary-data.html
+  resume_file BYTEA, 
+  cover_letter_file BYTEA,
   tags TEXT [],
-  career_name TEXT,
   application_date BIGINT NOT NULL,
   PRIMARY KEY(app_id)
 );
+
+/* 
+Note that BYTEA column values will be extremly long and will not be visible when printing column values to the terminal via the normal "SELECT * from apps" command. 
+If you want to visually check that there is some value in there, you can print out a partial value to psql terminal by running the following (for the left starting side):
+jobtracker=> select left(encode(resume_file,'hex'),40) from apps; 
+*/
 
 CREATE TABLE companies (
   company_id SERIAL,

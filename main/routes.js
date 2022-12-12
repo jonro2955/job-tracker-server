@@ -35,18 +35,20 @@ router.post("/api/post/postapp", (req, res, next) => {
     req.body.jobTitle,
     req.body.jobDescription,
     req.body.jobNotes,
-    req.body.files,
+    req.body.resumeFile,
+    req.body.coverLetterFile,
     req.body.tags,
     req.body.careerName,
     req.body.applicationDate,
   ];
   pool.query(
-    `INSERT INTO apps(username, posting_url, company_name, job_title, job_description, job_notes, files, tags, career_name, application_date )
-              VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+    `INSERT INTO apps(username, posting_url, company_name, job_title, job_description, job_notes, resume_file, cover_letter_file, tags, career_name, application_date )
+              VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
     values,
     (q_err, q_res) => {
       if (q_err) return next(q_err);
       res.json(q_res.rows);
+      console.log(q_res.rows);
     }
   );
 });
