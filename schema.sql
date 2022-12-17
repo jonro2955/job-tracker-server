@@ -40,7 +40,7 @@ CREATE TABLE apps (
   resume_file BYTEA, 
   cover_letter_file BYTEA,
   tags TEXT [],
-  application_date BIGINT NOT NULL,
+  application_date TEXT,
   PRIMARY KEY(app_id)
 );
 

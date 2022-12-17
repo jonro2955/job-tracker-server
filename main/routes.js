@@ -13,6 +13,17 @@ router.get("/api/get/userprofilefromdb", (req, res) => {
   });
 });
 
+router.get("/api/get/apps", (req, res) => {
+  const username = req.query.email;
+  pool.query(
+    `SELECT * FROM apps WHERE username = $1 ORDER BY application_date DESC`,
+    [username],
+    (q_err, q_res) => {
+      res.json(q_res.rows);
+    }
+  );
+});
+
 /**
  * Posts
  */
