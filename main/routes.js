@@ -3,9 +3,9 @@ var router = express.Router();
 var pool = require("./db");
 /* https://www.freecodecamp.org/news/fullstack-react-blog-app-with-express-and-psql/#setting-up-express-routes-and-psql-queries */
 
-/**
+/*********************************************************************
  * Gets
- */
+ *********************************************************************/
 router.get("/api/get/userprofilefromdb", (req, res) => {
   const username = req.query.email;
   pool.query(`SELECT * FROM users WHERE username = $1`, [username], (q_err, q_res) => {
@@ -13,10 +13,11 @@ router.get("/api/get/userprofilefromdb", (req, res) => {
   });
 });
 
-router.get("/api/get/apps", (req, res) => {
+router.get("/api/get/all-user-records", (req, res) => {
   const username = req.query.email;
+  console.log(typeof username);
   pool.query(
-    `SELECT * FROM apps WHERE username = $1 ORDER BY application_date DESC`,
+    `SELECT app_id, application_date, company_name, job_title, job_description FROM apps WHERE username = $1 ORDER BY application_date DESC`,
     [username],
     (q_err, q_res) => {
       res.json(q_res.rows);
@@ -24,9 +25,52 @@ router.get("/api/get/apps", (req, res) => {
   );
 });
 
-/**
+router.get("/api/get/search-terms", (req, res) => {
+  const username = req.query.email;
+  const searchStr = "%" + req.query.searchStr + "%";
+  switch (req.query.searchOption) {
+    case "option1":
+      pool.query(
+        `SELECT * FROM apps WHERE username = $1 AND job_description LIKE $2`,
+        [username, searchStr],
+        (q_err, q_res) => {
+          res.json(q_res.rows);
+        }
+      );
+      return;
+    case "option2":
+      pool.query(
+        `SELECT * FROM apps WHERE username = $1 AND company_name LIKE $2`,
+        [username, searchStr],
+        (q_err, q_res) => {
+          res.json(q_res.rows);
+        }
+      );
+      return;
+    case "option3":
+      pool.query(
+        `SELECT * FROM apps WHERE username = $1 AND job_title LIKE $2`,
+        [username, searchStr],
+        (q_err, q_res) => {
+          res.json(q_res.rows);
+        }
+      );
+      return;
+    default:
+      pool.query(
+        `SELECT * FROM apps WHERE username = $1 AND job_description LIKE $2`,
+        [username, searchStr],
+        (q_err, q_res) => {
+          res.json(q_res.rows);
+        }
+      );
+      return;
+  }
+});
+
+/**********************************************************************
  * Posts
- */
+ *********************************************************************/
 router.post("/api/post/userprofiletodb", (req, res) => {
   const values = [req.body.email];
   pool.query(
@@ -64,9 +108,9 @@ router.post("/api/post/postapp", (req, res, next) => {
   );
 });
 
-/**
+/**********************************************************************
  * Puts
- */
+ *********************************************************************/
 router.put("/api/put/careernum", (req, res, next) => {
   const values = [req.body.currentCareerNum, req.body.username];
   pool.query(
@@ -87,7 +131,7 @@ router.put("/api/put/careerslist", (req, res, next) => {
   });
 });
 
-/* 
+/*********************************************************************
 req.body = {
   username: 'freemovement@live.ca',
   careersList: [
@@ -99,7 +143,7 @@ req.body = {
   oldCareerName: 'o',
   newCareerName: 'n'
 }
-*/
+*********************************************************************/
 // look into "patch" instead of "put" to update only a few attributes
 router.put("/api/put/renamecareer", (req, res, next) => {
   let err_combined = { update_err1: {}, update_err2: {} };
