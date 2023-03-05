@@ -29,8 +29,8 @@ CREATE TABLE users (
 INSERT INTO users(username, careers_list, current_career_num) VALUES('demoUser', array['demo career 1', 'demo career 2', 'demo career 3'], 0);
 
 CREATE TABLE apps (
-  app_id SERIAL,
-  username TEXT REFERENCES users(username),
+  app_id SERIAL UNIQUE,
+  username TEXT UNIQUE REFERENCES users(username),
   career_name TEXT,
   posting_url TEXT,
   company_name TEXT NOT NULL,
