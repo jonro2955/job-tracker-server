@@ -8,16 +8,8 @@ var pool = require("./db");
  *********************************************************************/
 router.get("/api/get/userprofilefromdb", (req, res) => {
   const username = req.query.email;
-  pool.query(`SELECT * FROM users WHERE username = $1`, [username], (q_err, q_res) => {
-    res.json(q_res.rows);
-  });
-});
-
-router.get("/api/get/all-user-records", (req, res) => {
-  const username = req.query.email;
-  console.log(typeof username);
   pool.query(
-    `SELECT app_id, application_date, company_name, job_title, job_description FROM apps WHERE username = $1 ORDER BY application_date DESC`,
+    `SELECT * FROM users WHERE username = $1`,
     [username],
     (q_err, q_res) => {
       res.json(q_res.rows);
@@ -25,47 +17,56 @@ router.get("/api/get/all-user-records", (req, res) => {
   );
 });
 
+router.get("/api/get/userprofilefromdb", (req, res) => {
+  const username = req.query.email;
+  pool.query(
+    `SELECT * FROM users WHERE username = $1`,
+    [username],
+    (q_err, q_res) => {
+      res.json(q_res.rows);
+    }
+  );
+});
+
+router.get("/api/get/all-user-apps", (req, res) => {
+  const username = req.query.email;
+  pool.query(
+    `SELECT app_id, application_date, company_name, job_title, job_description FROM apps WHERE username = $1 ORDER BY app_id DESC`,
+    [username],
+    (q_err, q_res) => {
+      res.json(q_res.rows);
+    }
+  );
+});
+
+router.get("/api/get/app", (req, res) => {
+  const appId = req.query.id;
+  pool.query(
+    `SELECT app_id, username, career_name, posting_url, company_name, job_title, 
+    job_description, job_notes, encode(resume_file::bytea, 'escape') as "resume_file", 
+    encode(cover_letter_file, 'escape') as "cover_letter_file", 
+    tags, application_date FROM apps WHERE app_id = $1`,
+    [appId],
+    (q_err, q_res) => {
+      res.json(q_res.rows[0]);
+    }
+  );
+  console.log("Queried row id:", appId);
+});
+
+/* Server side search: not used because the client app will receive all records 
+from "/api/get/all-user-records" and will perform the search on the client side. */
 router.get("/api/get/search-terms", (req, res) => {
+  const columnName = req.query.searchOption;
   const username = req.query.email;
   const searchStr = "%" + req.query.searchStr + "%";
-  switch (req.query.searchOption) {
-    case "option1":
-      pool.query(
-        `SELECT * FROM apps WHERE username = $1 AND job_description LIKE $2`,
-        [username, searchStr],
-        (q_err, q_res) => {
-          res.json(q_res.rows);
-        }
-      );
-      return;
-    case "option2":
-      pool.query(
-        `SELECT * FROM apps WHERE username = $1 AND company_name LIKE $2`,
-        [username, searchStr],
-        (q_err, q_res) => {
-          res.json(q_res.rows);
-        }
-      );
-      return;
-    case "option3":
-      pool.query(
-        `SELECT * FROM apps WHERE username = $1 AND job_title LIKE $2`,
-        [username, searchStr],
-        (q_err, q_res) => {
-          res.json(q_res.rows);
-        }
-      );
-      return;
-    default:
-      pool.query(
-        `SELECT * FROM apps WHERE username = $1 AND job_description LIKE $2`,
-        [username, searchStr],
-        (q_err, q_res) => {
-          res.json(q_res.rows);
-        }
-      );
-      return;
-  }
+  pool.query(
+    `SELECT * FROM apps WHERE username = $1 AND ${columnName} LIKE $2`,
+    [username, searchStr],
+    (q_err, q_res) => {
+      res.json(q_res.rows);
+    }
+  );
 });
 
 /**********************************************************************
@@ -125,10 +126,14 @@ router.put("/api/put/careernum", (req, res, next) => {
 
 router.put("/api/put/careerslist", (req, res, next) => {
   const values = [req.body.careersList, req.body.username];
-  pool.query(`UPDATE users SET careers_list = $1 WHERE username = $2`, values, (q_err, q_res) => {
-    if (q_err) return next(q_err);
-    res.json(q_res);
-  });
+  pool.query(
+    `UPDATE users SET careers_list = $1 WHERE username = $2`,
+    values,
+    (q_err, q_res) => {
+      if (q_err) return next(q_err);
+      res.json(q_res);
+    }
+  );
 });
 
 /*********************************************************************
