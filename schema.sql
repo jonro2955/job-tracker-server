@@ -19,6 +19,9 @@ const data = {
 }
 */
 
+CREATE DATABASE jobtracker;
+
+/* When inside the jobtracker database */
 CREATE TABLE users (
   username TEXT UNIQUE NOT NULL, --user's email string or "demo" if logged out
   careers_list TEXT [] DEFAULT array['Career 1'], 

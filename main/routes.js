@@ -12,6 +12,7 @@ router.get("/api/get/userprofilefromdb", (req, res) => {
     `SELECT * FROM users WHERE username = $1`,
     [username],
     (q_err, q_res) => {
+      // console.log(q_res);
       res.json(q_res.rows);
     }
   );
@@ -78,6 +79,7 @@ router.post("/api/post/userprofiletodb", (req, res) => {
     `INSERT INTO users(username) VALUES($1) ON CONFLICT DO NOTHING`,
     values,
     (q_err, q_res) => {
+      console.log("/api/post/userprofiletodb");
       res.json(q_res.rows);
     }
   );
