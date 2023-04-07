@@ -16,8 +16,8 @@ postgres@pc-Precision-3510:~$ psql
 Now the prompt will looks like this:
 postgres=#
 
-Connect to the “test” db using the "\c" command: 
-postgres=# \c test
+Connect to the "jobtracker" db using the "\c" command: 
+postgres=# \c jobtracker
 
 How to set the postgres password when in psql shell:
 postgres=# ALTER USER postgres WITH PASSWORD '<newpassword>'; 
@@ -36,7 +36,5 @@ pool.connect((err, client, release) => {
     return console.error("Error acquiring client", err.stack);
   }
 });
-
-
 
 module.exports = pool;

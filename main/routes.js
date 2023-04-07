@@ -52,7 +52,6 @@ router.get("/api/get/app", (req, res) => {
       res.json(q_res.rows[0]);
     }
   );
-  console.log("Queried row id:", appId);
 });
 
 /* Server side search: not used because the client app will receive all records 
@@ -178,6 +177,17 @@ router.put("/api/put/renamecareer", (req, res, next) => {
       res.json(res_combined);
     }
   );
+});
+
+/**********************************************************************
+ * Delete
+ *********************************************************************/
+router.get("/api/get/deleteapp", (req, res) => {
+  const appId = req.query.id;
+  pool.query(`DELETE FROM apps WHERE app_id = $1`, [appId], (q_err, q_res) => {
+    if (q_err) console.log(q_err);
+    res.json(q_res);
+  });
 });
 
 module.exports = router;

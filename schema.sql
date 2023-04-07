@@ -33,7 +33,7 @@ INSERT INTO users(username, careers_list, current_career_num) VALUES('demoUser',
 
 CREATE TABLE apps (
   app_id SERIAL UNIQUE,
-  username TEXT UNIQUE REFERENCES users(username),
+  username TEXT REFERENCES users(username),
   career_name TEXT,
   posting_url TEXT,
   company_name TEXT NOT NULL,
@@ -43,6 +43,7 @@ CREATE TABLE apps (
   resume_file BYTEA, 
   cover_letter_file BYTEA,
   tags TEXT [],
+  current_status INT,
   application_date TEXT,
   PRIMARY KEY(app_id)
 );
@@ -50,7 +51,7 @@ CREATE TABLE apps (
 /* 
 Note that BYTEA column values will be extremly long and will not be visible when printing column values to the terminal via the normal "SELECT * from apps" command. 
 If you want to visually check that there is some value in there, you can print out a partial value to psql terminal by running the following (for the left starting side):
-jobtracker=> select left(encode(resume_file,'hex'),40) from apps; 
+jobtracker=> select left(encode(my_file, 'escape'), 50) from apps where id = 24;
 */
 
 CREATE TABLE companies (
