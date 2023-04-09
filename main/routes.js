@@ -99,8 +99,9 @@ router.post("/api/post/postapp", (req, res, next) => {
     req.body.applicationDate,
   ];
   pool.query(
-    `INSERT INTO apps(username, posting_url, company_name, job_title, job_description, job_notes, resume_file, cover_letter_file, tags, career_name, application_date )
-              VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+    `INSERT INTO apps(username, posting_url, company_name, job_title, job_description, 
+      job_notes, resume_file, cover_letter_file, tags, career_name, application_date) 
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
     values,
     (q_err, q_res) => {
       if (q_err) return next(q_err);
@@ -113,6 +114,33 @@ router.post("/api/post/postapp", (req, res, next) => {
 /**********************************************************************
  * Puts
  *********************************************************************/
+router.put("/api/put/putapp", (req, res, next) => {
+  const values = [
+    req.body.appId,
+    req.body.postingURL,
+    req.body.companyName,
+    req.body.jobTitle,
+    req.body.jobDescription,
+    req.body.jobNotes,
+    req.body.resumeFile,
+    req.body.coverLetterFile,
+    req.body.tags,
+    req.body.careerName,
+  ];
+  pool.query(
+    // PostgreSQL UPDATE https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-update/
+    `UPDATE apps SET posting_url = $2, company_name = $3, job_title = $4, 
+      job_description = $5, job_notes = $6, resume_file = $7, cover_letter_file = $8, 
+      tags = $9, career_name = $10 WHERE app_id = $1`,
+    values,
+    (q_err, q_res) => {
+      if (q_err) return next(q_err);
+      res.json(q_res.rows);
+      console.log(q_res.rows);
+    }
+  );
+});
+
 router.put("/api/put/careernum", (req, res, next) => {
   const values = [req.body.currentCareerNum, req.body.username];
   pool.query(
